@@ -1,6 +1,6 @@
 # GRN
 
-## Inputs
+### Inputs
 
 - **V** ∈ ℝ<sup>G×F</sup>  
   - *G*: Number of available genes from **genePT**  
@@ -10,7 +10,7 @@
   - *L*: Number of cells in the sample  
   - *N*: Number of genes in the sample  
 
-## Objective
+### Objective
 
 - Leverage the prior knowledge encoded in **V** to infer a more accurate gene regulatory network (GRN) from the observed gene expression data **X**.
 - **Output**: 𝒢 = (**𝒱**, **A**), where  
