@@ -1,5 +1,12 @@
 # GRN
 
+### Objective
+
+- Leverage the prior knowledge to infer a more accurate gene regulatory network (GRN) from the observed gene expression data **X**.
+- **Output**: 𝒢 = (**𝒱**, **A**), where  
+  - |𝒱| = **N**  
+  - **A** ∈ {0,1}<sup>N×N</sup>
+  
 ### Inputs
 
 - **V** ∈ ℝ<sup>G×F</sup>  
@@ -10,9 +17,4 @@
   - *L*: Number of cells in the sample  
   - *N*: Number of genes in the sample  
 
-### Objective
 
-- Leverage the prior knowledge encoded in **V** to infer a more accurate gene regulatory network (GRN) from the observed gene expression data **X**.
-- **Output**: 𝒢 = (**𝒱**, **A**), where  
-  - |𝒱| = **N**  
-  - **A** ∈ {0,1}<sup>N×N</sup>
