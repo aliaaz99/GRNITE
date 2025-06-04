@@ -17,6 +17,12 @@ import scipy.sparse as sp
 import torch.nn as nn
 import torch.nn.functional as F
 from torch_geometric.nn import GCNConv
+from sklearn.metrics.pairwise import cosine_similarity
+from scipy.stats import skew, kurtosis
+from sklearn.covariance import GraphicalLasso
+
+
+
 
 
 class GCNEncoder(nn.Module):
@@ -76,7 +82,7 @@ def get_adjacency_matrix(distance_matrix, threshold=None):
 
 
 # Given gene name, get the embedding and consrtuct a distance matrix between the embeddings of those genes
-def get_distance_matrix(gene_names, gene_names_all, data):
+def get_present(gene_names, gene_names_all, data):
     """
     Given a list of gene names and a dictionary of gene embeddings, 
     return the distance matrix between the embeddings of those genes.
@@ -93,16 +99,9 @@ def get_distance_matrix(gene_names, gene_names_all, data):
             continue
     # Convert the list of embeddings to a numpy array
     embeddings = np.array(gene_embeddings_sample)
-    print(embeddings.shape)
-    
-    # Compute the distance matrix
-    embeddings = normalize(embeddings, norm='l2')
-    distance_matrix = np.linalg.norm(embeddings[:, np.newaxis] - embeddings, axis=2) 
-    # # diagonal to zero
-    # np.fill_diagonal(distance_matrix, 0)
+    print("Present genes found and embeddings shape:", embeddings.shape)
 
-
-    return distance_matrix, present_genes, embeddings
+    return present_genes, embeddings
 
 # plot the graph of the adjacency matrix
 def plot_graph(adjacency_matrix, gene_names):
@@ -246,3 +245,15 @@ def load_edge_set(csv_path):
     df = pd.read_csv(csv_path)
     edge_set = set(tuple(sorted([row['Gene1'], row['Gene2']])) for _, row in df.iterrows())
     return edge_set
+
+
+
+def fit_nb_and_extract_features(x):
+    x = np.asarray(x)
+    mean = np.mean(x)
+    var = np.var(x)
+    alpha = (var - mean) / (mean**2 + 1e-6)
+    cv = np.std(x) / (mean + 1e-6)
+    q25, med, q75 = np.percentile(x, [25, 50, 75])
+
+    return [mean, var, alpha, q25, med, q75, cv]
