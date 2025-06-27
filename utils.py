@@ -16,7 +16,7 @@ import numpy as np
 import scipy.sparse as sp
 import torch.nn as nn
 import torch.nn.functional as F
-from torch_geometric.nn import GCNConv
+from torch_geometric.nn import GCNConv, SAGEConv
 from sklearn.metrics.pairwise import cosine_similarity
 from scipy.stats import skew, kurtosis
 from sklearn.covariance import GraphicalLasso
@@ -201,7 +201,7 @@ def wgcna_grn(X, beta=1):
 
 
 
-def adj_bce_loss(pred_adj, true_adj, mask=None):
+def adj_bce_loss(pred_adj, true_adj, mask=None, pos_weight=None):
     if mask is None:
         N = pred_adj.shape[0]
         triu_indices = torch.triu_indices(N, N, offset=1)
@@ -211,8 +211,16 @@ def adj_bce_loss(pred_adj, true_adj, mask=None):
         pred_flat = pred_adj[mask]
         true_flat = true_adj[mask]
 
-    bce_loss = nn.BCELoss()
+    # Compute weights: pos_weight for 1s, 1.0 for 0s
+    if pos_weight is not None:
+        weight = torch.ones_like(true_flat)
+        weight[true_flat == 1] = pos_weight  # Increase weight for positive samples
+    else:
+        weight = None
+
+    bce_loss = nn.BCELoss(weight=weight, reduction='mean')
     return bce_loss(pred_flat, true_flat)
+
 
 
 
@@ -227,11 +235,11 @@ def compute_confusion_matrix(pred_grn, ref_grn, all_genes):
     tn = len(all_possible_edges - (pred_grn | ref_grn))
 
     # Calculate F1 score
-    precision = tp / (tp + fp) if (tp + fp) > 0 else 0
-    recall = tp / (tp + fn) if (tp + fn) > 0 else 0
-    f1_score = 100 * 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+    precision = 100 * tp / (tp + fp) if (tp + fp) > 0 else 0
+    recall = 100 * tp / (tp + fn) if (tp + fn) > 0 else 0
+    f1_score = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
     
-    return np.array([[tn, fp], [fn, tp]], dtype=int), f1_score
+    return np.array([[tn, fp], [fn, tp]], dtype=int), np.round(f1_score,2), np.round(recall,2), np.round(precision,2)
 
 
 # Compute pairwise Jaccard Index
