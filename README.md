@@ -55,15 +55,10 @@ You should have the following directory structure in the project folder:
 You need to place your data files in the respective folders inside the `Data` directory. An example is provided above for `hESC` dataset.
 
 2. **Generating the results:**
+   
 
 
-3. **Evaluation:**
-
-
-## Output files:
-
-GRNITE generates the following outputs:
-
+4. **Evaluation:**
 
 
 ## Example Usage
