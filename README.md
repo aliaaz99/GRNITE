@@ -113,7 +113,7 @@ The `ExpressionData.csv` for `TF500/hESC` is included here.
 Execute the following bash script to run the first step of GRNITE, which constructs the prior graph for both datasets: `TF500/hESC` and `Data/GroundGAN/PBMC-ALL-Human`.
 
 ```bash
-bash Step1.sh > logs/example_1.log
+bash Step1.sh > logs/example_step_1.log
 ```
 
 3. **Run Step 2 – Enhanced GRN generation**
@@ -122,7 +122,7 @@ The output GRNs from **SCENIC** and **GRNBoost** are already included in the cor
 You can now run the next script to generate the enhanced GRNs using GRNITE:
 
   ```sh
-  bash Step1.sh > logs/example_2.log
+  bash Step1.sh > logs/example_step_2.log
   ```
 
 4. **Evaluate the results**
