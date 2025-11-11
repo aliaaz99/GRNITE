@@ -63,7 +63,7 @@ GRNITE generates the following outputs:
 ## Example usage:
 
 ```sh
-bash example.sh
+bash example.sh > logs/example.log
 ```
 
 # Citation
