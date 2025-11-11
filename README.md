@@ -70,11 +70,8 @@ GRNITE generates the following outputs:
 
 1. **Download the data**
 
-   Download the expression matrix for the `PBMC-ALL-Human` dataset from the [GroundGAN Benchmarking page](https://emad-combine-lab.github.io/GRouNdGAN/benchmarking).  
-   Place the file at: ```Data/GroundGAN/PBMC-ALL-Human/ExpressionData.csv```
-
-
-as described in the setup section above.
+Download the expression matrix for the `PBMC-ALL-Human` dataset from the [GroundGAN Benchmarking page](https://emad-combine-lab.github.io/GRouNdGAN/benchmarking).  
+Place the file at: ```Data/GroundGAN/PBMC-ALL-Human/ExpressionData.csv``` as described in the setup section above.
 
 2. **Run Step 1 – Prior graph generation**
 
@@ -86,8 +83,8 @@ bash Step1.sh > logs/example_1.log
 
 3. **Run Step 2 – Enhanced GRN generation**
 
-  The output GRNs from SCENIC and GRNBoost are already included in the corresponding folders.
-  You can now run the next script to generate the enhanced GRNs using GRNITE:
+The output GRNs from SCENIC and GRNBoost are already included in the corresponding folders.
+You can now run the next script to generate the enhanced GRNs using GRNITE:
 
   ```sh
   bash Step1.sh > logs/example_2.log
@@ -100,6 +97,8 @@ Finally, evaluate the base GRNs (SCENIC and GRNBoost) along with their GRNITE-en
 ```sh
 python Eval.py > logs/example_eval.log
 ```
+
+This will generate `Example_Eval.xlsx`, which contains different evaluation metrics for each method and dataset. Each sheet in the Excel file corresponds to a separate dataset.
 
 # Citation
 If you use GRNITE in your research, please cite the following paper:
