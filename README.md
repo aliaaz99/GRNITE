@@ -66,13 +66,40 @@ GRNITE generates the following outputs:
 
 
 
-## Example usage:
+## Example Usage
 
-```sh
-bash example.sh > logs/example.log
+1. **Download the data**
+
+   Download the expression matrix for the `PBMC-ALL-Human` dataset from the [GroundGAN Benchmarking page](https://emad-combine-lab.github.io/GRouNdGAN/benchmarking).  
+   Place the file at: ```Data/GroundGAN/PBMC-ALL-Human/ExpressionData.csv```
+
+
+as described in the setup section above.
+
+2. **Run Step 1 – Prior graph generation**
+
+Execute the following bash script to run the first step of GRNITE, which constructs the prior graph for both datasets: `TF500/hESC` and `Data/GroundGAN/PBMC-ALL-Human`.
+
+```bash
+bash Step1.sh > logs/example_1.log
 ```
 
-PBMC link: https://emad-combine-lab.github.io/GRouNdGAN/benchmarking
+3. **Run Step 2 – Enhanced GRN generation**
+
+  The output GRNs from SCENIC and GRNBoost are already included in the corresponding folders.
+  You can now run the next script to generate the enhanced GRNs using GRNITE:
+
+  ```sh
+  bash Step1.sh > logs/example_2.log
+  ```
+
+4. **Evaluate the results**
+
+Finally, evaluate the base GRNs (SCENIC and GRNBoost) along with their GRNITE-enhanced versions using:
+
+```sh
+python Eval.py > logs/example_eval.log
+```
 
 # Citation
 If you use GRNITE in your research, please cite the following paper:
