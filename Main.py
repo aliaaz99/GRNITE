@@ -70,6 +70,9 @@ num_cells_sample, num_genes_sample = data_sample.shape
 print(f"Number of cells: {num_cells_sample}, Number of genes: {num_genes_sample}")
 gene_names_sample = list(data_sample.columns)
 
+gene_names_sample = [g.upper() for g in gene_names_sample]
+data_sample.columns = gene_names_sample
+
 # Function to get the present genes and their embeddings
 # X_sample_emb: the gene embeddings from PT for the genes present in the sample
 present_genes, X_sample_emb = get_present(gene_names_sample, gene_names_all, data_emb)
