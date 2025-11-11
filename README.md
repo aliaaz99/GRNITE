@@ -67,7 +67,10 @@ You need to place your data files in the respective folders inside the `Data` di
      ```bash
      python Main.py --step 2 --targetMethod $NAME
      ```
-     where `$NAME` can be one of `{scenic, grnboost, celloracle, portia, correlation, deeprig}`.
+     where `$NAME` can be one of
+     ```bash
+     {scenic, grnboost, celloracle, portia, correlation, deeprig}.
+     ```
 
    You can also run `Eval.py` to evaluate the GRNs you have generated against a reference network:
    ```bash
