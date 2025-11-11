@@ -137,7 +137,7 @@ The output GRNs from **SCENIC** and **GRNBoost** are already included in the cor
 You can now run the next script to generate the enhanced GRNs using GRNITE:
 
   ```sh
-  bash Step1.sh > logs/example_step_2.log
+  bash Step2.sh > logs/example_step_2.log
   ```
 
 4. **Evaluate the results**
