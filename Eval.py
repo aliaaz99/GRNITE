@@ -461,7 +461,7 @@ def EarlyPrec(ref_path, input_path, method):
 
 # Add Other datasets here
 sample_names = [
-                "groundGAN/PBMC-ALL-Human/", 
+                "GroundGAN/PBMC-ALL-Human/", 
                 "TF500/hESC/",
                  ]
 
