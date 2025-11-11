@@ -32,17 +32,23 @@ pip install -r requirements.txt
 You should have the following directory structure in the project folder:
 
 ```
-├── Codes.py
+├── Main.py
+├── utils.py
+├── Eval.py
 ├── Gene_emebddings
+│ ├── human_embeds-Qwen3-Embedding-8B.h5
+│ ├── mouse_embeds-Qwen3-Embedding-8B.h5
+│ ├── celloracle_baseGRN.csv
+│ ├── celloracle_mouse_baseGRN.csv
 ├── Data
-│ ├── PBMC-ALL-Human
+│ ├── GroundGAN/PBMC-ALL-Human
 │ │ ├── ExpressionData.csv
 │ │ ├── refNetwork.csv (Optional for evaluation)
-│ │ ├── PBMC-ALL-Human-{MethodName}.csv (Target method to improve)
+│ │ ├── PBMC-ALL-Human-{MethodXName}.csv (Target graph obtained from method X)
 │ ├── TF500/hESC
 │ │ ├── ExpressionData.csv
 │ │ ├── refNetwork.csv (Optional for evaluation)
-│ │ ├── hESC-{MethodName}.csv (Target method to improve)
+│ │ ├── hESC-{MethodXName}.csv (Target graph obtained from method X)
 │ ├── (other folders for different cases)
 ```
 
