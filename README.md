@@ -54,7 +54,7 @@ You should have the following directory structure in the project folder:
 
 You need to place your data files in the respective folders inside the `Data` directory. An example is provided above for `TF500/hESC` and `GroundGAN/PBMC-ALL-Human` dataset.
 
-You can download the four files in the `Gene_embeddings` folder, which include the human and mouse text embeddings as well as the base CellOracle graph, from this[link](...).
+You can download the four files in the `Gene_embeddings` folder, which include the human and mouse text embeddings as well as the base CellOracle graph, from this[link](https://rice.box.com/s/qhpgkp0813zhfhjy2hmi04x2asdmaalv).
 
 2. **Generating the results:**
 
