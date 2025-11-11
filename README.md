@@ -52,14 +52,31 @@ You should have the following directory structure in the project folder:
 │ ├── (other folders for different cases)
 ```
 
-You need to place your data files in the respective folders inside the `Data` directory. An example is provided above for `hESC` dataset.
+You need to place your data files in the respective folders inside the `Data` directory. An example is provided above for `TF500/hESC` and `GroundGAN/PBMC-ALL-Human` dataset.
 
 2. **Generating the results:**
+
+   You can run `Main.py` to rub GRNITE.
+   To do so, if you are running the first step to generate the prior graph you need to specify `--step 1` and if you have already run the first step and want to enhance the GRN of another method you should run with `--step 2` and `--targetMethod $NAME` where $NAME can be one of `{scenic, grnboost, celloracle, portia, correlation, deeprig}`. Also you can run `Eval.py` to evaluate the methods that you want compared to a reference GRN. If so, you have to have the `refNetwork.csv` in the data folder of each dataset.
+   Note that in all GRN files please have the column names as `Gene1` and `Gene2`.
    
+Also here are the parameters that you can change for `Main.py`:
 
 
-4. **Evaluation:**
-
+| Parameter          | Default Value     | Description                                                              |
+|--------------------|-------------------|--------------------------------------------------------------------------|
+| `--dataPath`           | 'TF500/hESC'     | Path to the Expression matrix and refNetwork  |
+| `--step`          | 1    | Step 1 or 2 of GRNITE, Step1 for getting prior graph, Step 2 for improving existing GRN method                                                        |
+| `--targetMethod`          | 'celloracle'     | Target GRN method name to improve (if running Step 2)                                                         |
+| `--n_low`            | 100                | Number of dimensions to reduce to in X_sample_reduced, default is 100                                       |
+| `--neg_multiplier`             | 1                | Ratio of negative samples to positive samples, default is 1                            |
+| `--gnn_dim_hidden`             | "32,32"                 | Hidden units per layer for GNN encoder, comma separated                                 |
+| `--name`           | 'grnite'                 | Name added to the end of saved graphs                     |
+| `--sample`  | None                | Used for small subsamples of GroundGAN datasets (uses cell numbers of 2000*(sample - 1) till 2000*sample                                                     |
+| `--beta`             | 0.5                 | Weight for target loss vs prior loss in step 2, default is 0.5                                        |
+| `--lr`           | 0.01                 | Learning rate for GNN model, default is 0.01                     |
+| `--num_epoch`  | 5000                | Number of training epochs, default is 5000                                                    |
+| `--gpu`  | 0                | GPU id to use, default is 0                                                     |
 
 ## Example Usage
 
@@ -67,6 +84,7 @@ You need to place your data files in the respective folders inside the `Data` di
 
 Download the expression matrix for the `PBMC-ALL-Human` dataset from the [GroundGAN Benchmarking page](https://emad-combine-lab.github.io/GRouNdGAN/benchmarking).  
 Place the file at: ```Data/GroundGAN/PBMC-ALL-Human/ExpressionData.csv``` as described in the setup section above.
+The `ExpressionData.csv` for `TF500/hESC` is included here.
 
 2. **Run Step 1 – Prior graph generation**
 
@@ -78,7 +96,7 @@ bash Step1.sh > logs/example_1.log
 
 3. **Run Step 2 – Enhanced GRN generation**
 
-The output GRNs from SCENIC and GRNBoost are already included in the corresponding folders.
+The output GRNs from **SCENIC** and **GRNBoost** are already included in the corresponding folders with `{dataname}-scenic-network.csv` and `{dataname}-grnboost.csv` names.
 You can now run the next script to generate the enhanced GRNs using GRNITE:
 
   ```sh
