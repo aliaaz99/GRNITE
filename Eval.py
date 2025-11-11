@@ -467,7 +467,6 @@ sample_names = [
 
 # Add other methods here
 method_names = [
-                "step1_grnite",
                 "scenic-network", "scenic-network_grnite",
                 "grnboost", "grnboost_grnite",
                 ]
