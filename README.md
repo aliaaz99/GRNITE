@@ -56,27 +56,46 @@ You need to place your data files in the respective folders inside the `Data` di
 
 2. **Generating the results:**
 
-   You can run `Main.py` to rub GRNITE.
-   To do so, if you are running the first step to generate the prior graph you need to specify `--step 1` and if you have already run the first step and want to enhance the GRN of another method you should run with `--step 2` and `--targetMethod $NAME` where $NAME can be one of `{scenic, grnboost, celloracle, portia, correlation, deeprig}`. Also you can run `Eval.py` to evaluate the methods that you want compared to a reference GRN. If so, you have to have the `refNetwork.csv` in the data folder of each dataset.
-   Note that in all GRN files please have the column names as `Gene1` and `Gene2`.
-   
-Also here are the parameters that you can change for `Main.py`:
+   You can run `Main.py` to execute GRNITE.  
+   To do so:
 
+   - If you are running the **first step** to generate the prior graph, specify:
+     ```bash
+     python Main.py --step 1
+     ```
+   - If you have already completed the first step and want to **enhance the GRN** of another method, run:
+     ```bash
+     python Main.py --step 2 --targetMethod $NAME
+     ```
+     where `$NAME` can be one of `{scenic, grnboost, celloracle, portia, correlation, deeprig}`.
 
-| Parameter          | Default Value     | Description                                                              |
-|--------------------|-------------------|--------------------------------------------------------------------------|
-| `--dataPath`           | 'TF500/hESC'     | Path to the Expression matrix and refNetwork  |
-| `--step`          | 1    | Step 1 or 2 of GRNITE, Step1 for getting prior graph, Step 2 for improving existing GRN method                                                        |
-| `--targetMethod`          | 'celloracle'     | Target GRN method name to improve (if running Step 2)                                                         |
-| `--n_low`            | 100                | Number of dimensions to reduce to in X_sample_reduced, default is 100                                       |
-| `--neg_multiplier`             | 1                | Ratio of negative samples to positive samples, default is 1                            |
-| `--gnn_dim_hidden`             | "32,32"                 | Hidden units per layer for GNN encoder, comma separated                                 |
-| `--name`           | 'grnite'                 | Name added to the end of saved graphs                     |
-| `--sample`  | None                | Used for small subsamples of GroundGAN datasets (uses cell numbers of 2000*(sample - 1) till 2000*sample                                                     |
-| `--beta`             | 0.5                 | Weight for target loss vs prior loss in step 2, default is 0.5                                        |
-| `--lr`           | 0.01                 | Learning rate for GNN model, default is 0.01                     |
-| `--num_epoch`  | 5000                | Number of training epochs, default is 5000                                                    |
-| `--gpu`  | 0                | GPU id to use, default is 0                                                     |
+   You can also run `Eval.py` to evaluate the GRNs you have generated against a reference network:
+   ```bash
+   python Eval.py
+   ```
+  Ensure that a file named `refNetwork.csv` is present in the data folder of each dataset to serve as the reference GRN if you want to perform evaluation.
+
+  **Note:** All GRN files should contain columns named `Gene1` and `Gene2`.
+
+  
+3. **Parameters**
+
+   You can modify the following parameters when running `Main.py` to adjust GRNITE’s behavior and training configuration.
+
+| Parameter | Default Value | Description |
+|------------|----------------|--------------|
+| `--dataPath` | `'TF500/hESC'` | Path to the expression matrix and reference network. |
+| `--step` | `1` | Specifies which stage of GRNITE to run: Step 1 for generating the prior graph, Step 2 for enhancing an existing GRN method. |
+| `--targetMethod` | `'celloracle'` | Name of the GRN method to improve (used only in Step 2). |
+| `--n_low` | `100` | Number of dimensions for dimensionality reduction of the Expression matrix. |
+| `--neg_multiplier` | `1` | Ratio of negative samples to positive samples during training. |
+| `--gnn_dim_hidden` | `"32,32"` | Hidden layer sizes for the GNN encoder (comma-separated). |
+| `--name` | `'grnite'` | Suffix added to the names of saved graph files. |
+| `--sample` | `None` | Index for subsampling GroundGAN datasets (uses cell indices from `2000 × (sample – 1)` to `2000 × sample`). |
+| `--beta` | `0.5` | Weight balancing target loss vs. prior loss in Step 2. |
+| `--lr` | `0.01` | Learning rate for training the GNN model. |
+| `--num_epoch` | `5000` | Number of training epochs. |
+| `--gpu` | `0` | GPU ID to use (default: 0). |
 
 ## Example Usage
 
