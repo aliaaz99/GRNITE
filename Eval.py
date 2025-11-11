@@ -492,11 +492,8 @@ for sample in sample_names:
 
         except Exception as e:
             print(f"Error in PRROC for method {method} on sample {sample_name}: {e}")
-            precision, recall, f1, AUPRC, AUROC, ball_acc, jc = 0, 0, 0, 0, 0, 0, 0
-            possible_edges, true_edges, pred_edges = 0, 0, 0
-
-        
-
+            precision, recall, f1, AUPRC, AUROC, ball_acc, jc, possible_edges, true_edges, pred_edges = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    
         method_metrics.append([method, ball_acc, jc, precision, recall, f1, AUPRC, AUROC,  possible_edges, true_edges, pred_edges])
         print("Confusion Matrix:")
         print(cm)
