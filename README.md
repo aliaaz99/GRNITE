@@ -72,6 +72,8 @@ GRNITE generates the following outputs:
 bash example.sh > logs/example.log
 ```
 
+PBMC link: https://emad-combine-lab.github.io/GRouNdGAN/benchmarking
+
 # Citation
 If you use GRNITE in your research, please cite the following paper:
 
