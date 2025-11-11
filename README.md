@@ -71,8 +71,20 @@ You can download the four files in the `Gene_embeddings` folder, which include t
      ```
      where `$NAME` can be one of
      ```bash
-     {scenic, grnboost, celloracle, portia, correlation, deeprig}.
+     {scenic, grnboost, celloracle, portia, correlation, deeprig, dazzle}.
      ```
+    **Note:** You must include the target GRN file of the method you wish to enhance in the corresponding data folder.
+    Below is the mapping between each method name and the expected GRN file name:
+   
+    | Method       | Expected GRN File Name                       |
+    | ------------ | -------------------------------------------- |
+    | `scenic`     | `{dataName}-scenic-network.csv`              |
+    | `grnboost`   | `{dataName}-grnboost.csv`                    |
+    | `celloracle` | `{dataName}-celloracle-whole.csv`            |
+    | `portia`     | `{dataName}-portia.csv`                      |
+    | `deeprig`    | `{dataName}-celloracle-deeprig_filtered.csv` |
+    | `dazzle`     | `{dataName}-dazzle-full_filtered.csv`        |
+
 
    You can also run `Eval.py` to evaluate the GRNs you have generated against a reference network:
    ```bash
