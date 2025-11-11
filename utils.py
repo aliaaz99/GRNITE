@@ -161,16 +161,14 @@ def load_edge_set(csv_path, undirected=True):
     # Detect column names automatically
     if {'Gene1', 'Gene2'}.issubset(df.columns):
         source_col, target_col = 'Gene1', 'Gene2'
-    elif {'TF', 'Target'}.issubset(df.columns):
-        source_col, target_col = 'TF', 'Target'
     else:
         raise ValueError("CSV must contain either ['Gene1', 'Gene2'] or ['TF', 'Target'] columns.")
     
     # Build edge set
     if undirected:
-        edge_set = set(tuple(sorted([row[source_col], row[target_col]])) for _, row in df.iterrows())
+        edge_set = set(tuple(sorted([row[source_col].upper(), row[target_col].upper()])) for _, row in df.iterrows())
     else:
-        edge_set = [(row[source_col], row[target_col]) for _, row in df.iterrows()]
+        edge_set = [(row[source_col].upper(), row[target_col].upper()) for _, row in df.iterrows()]
 
     return edge_set
 
