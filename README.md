@@ -41,14 +41,14 @@ You should have the following directory structure in the project folder:
 │ ├── celloracle_baseGRN.csv
 │ ├── celloracle_mouse_baseGRN.csv
 ├── Data
-│ ├── GroundGAN/PBMC-ALL-Human
-│ │ ├── ExpressionData.csv
-│ │ ├── refNetwork.csv (Optional for evaluation)
-│ │ ├── PBMC-ALL-Human-{MethodXName}.csv (Target graph obtained from method X)
 │ ├── TF500/hESC
 │ │ ├── ExpressionData.csv
 │ │ ├── refNetwork.csv (Optional for evaluation)
 │ │ ├── hESC-{MethodXName}.csv (Target graph obtained from method X)
+│ ├── GroundGAN/PBMC-ALL-Human
+│ │ ├── ExpressionData.csv
+│ │ ├── refNetwork.csv (Optional for evaluation)
+│ │ ├── PBMC-ALL-Human-{MethodXName}.csv (Target graph obtained from method X)
 │ ├── (other folders for different cases)
 ```
 
