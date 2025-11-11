@@ -27,7 +27,8 @@ dataPath = args.dataPath
 dataName = dataPath.split('/')[-1]
 print("Data path: ", dataPath)
 print("Data name: ", dataName)
-species = 'human' if dataName in ['PBMC-ALL-Human', 'PBMC_CTL-Human', 'Tumor-ALL', 'Tumor-malignant', 'hESC', 'hHep'] else 'mouse'
+species = 'human' if dataName in ['PBMC-ALL-Human', 'PBMC_CTL-Human', 'Tumor-ALL', 'Tumor-malignant', 'hESC', 'hHep', 'PBMC', 'HFD'] else 'mouse'
+print("Species: ", species)
 step = args.step
 n_low = args.n_low
 neg_multiplier = args.neg_multiplier
@@ -136,9 +137,9 @@ if targetMethod == 'correlation':
     edges_corr_df = pd.DataFrame(edges_corr, columns=['Gene1', 'Gene2'])
     edges_corr_df['weight'] = weights_corr
     if subsample is not None:
-        edges_corr_df.to_csv('Data/target/' + dataName + f'-corr_edges-{subsample}.csv', index=False)
+        edges_corr_df.to_csv(f'Data/{dataPath}/' + dataName + f'-corr_edges-{subsample}.csv', index=False)
     else:
-        edges_corr_df.to_csv('Data/target/' + dataName + '-corr_edges.csv', index=False)
+        edges_corr_df.to_csv(f'Data/{dataPath}/' + dataName + '-corr_edges.csv', index=False)
     print("Corr edges saved!")
 
 
@@ -316,10 +317,14 @@ else:
 
 
 # (Optional) Get the subset of the reference GRN with only present genes:
-data_path_true = 'Data/' + dataPath + '/refNetwork.csv'
-ref_grn_un = load_edge_set(data_path_true, undirected=False)
-present_genes_upper = set(g.upper() for g in present_genes)
-ref_grn_present = [(g1, g2) for g1, g2 in ref_grn_un if g1 in present_genes_upper and g2 in present_genes_upper]
-ref_grn_present_path = 'Data/' + dataPath + '/' + dataName + '-ref_present.csv'
-ref_present_df = pd.DataFrame(list(ref_grn_present), columns=['Gene1', 'Gene2'])
-ref_present_df.to_csv(ref_grn_present_path, index=False)
+try:
+    data_path_true = 'Data/' + dataPath + '/refNetwork.csv'
+    ref_grn_un = load_edge_set(data_path_true, undirected=False)
+    present_genes_upper = set(g.upper() for g in present_genes)
+    ref_grn_present = [(g1, g2) for g1, g2 in ref_grn_un if g1 in present_genes_upper and g2 in present_genes_upper]
+    ref_grn_present_path = 'Data/' + dataPath + '/' + dataName + '-ref_present.csv'
+    ref_present_df = pd.DataFrame(list(ref_grn_present), columns=['Gene1', 'Gene2'])
+    ref_present_df.to_csv(ref_grn_present_path, index=False)
+    print("Reference GRN with present genes saved!")
+except Exception as e:
+    print("Could not save reference GRN with present genes:", e)
