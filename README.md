@@ -4,7 +4,7 @@ This repository contains all the necessary code and commands for "GRNITE: Gene R
 
 In order to improve the quality of GRN inference and enable more comprehensive exploratory analyses of GRNs across various phenotypes of interest we developed a two-stage meta-method called GRNITE. In the first step, GRNITE leverages LLM-based embeddings of plain text gene descriptions to create a prior gene interaction graph which is then optimized with a graph neural network (GNN) to achieve a **universal** biological prior for GRN inference. In the second step, GRNITE uses a GNN to incorporate information from a GRN inferred from scRNA-seq data with any baseline inference method into our prior. The result of this two-step approach is a near-universal improvement in AUROC and recall of all evaluated methods, with minor trade-offs in precision. Furthermore, GRNITE is a lightweight meta-method, which adds minimal amount of extra compute time on top of the original GRN inference performed.
 
-[grn-inference-1-long.pdf](https://github.com/user-attachments/files/23595264/grn-inference-1-long.pdf)
+<img width="7386" height="2796" alt="grn-inference-1-long" src="https://github.com/user-attachments/assets/64b4e60c-56e5-4eb6-820d-f7d3a9ade033" />
 
 
 ## Installation & Dependencies
