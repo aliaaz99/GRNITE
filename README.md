@@ -4,15 +4,9 @@ This repository contains the code and commands for **"GRNITE: Gene Regulatory Ne
 
 ## Overview
 
-Inferring gene regulatory networks (GRNs) from single-cell RNA-seq (scRNA-seq) data is a hard problem, and existing methods perform inconsistently across organisms and cell types. GRNITE is a lightweight **meta-method**: instead of being yet another standalone GRN inference algorithm, it takes the output of *any* existing method and improves it. It does so by combining three sources of information — the semantic content of LLM-based text descriptions of genes, curated biological prior knowledge (ChIP-seq-confirmed TF–target interactions), and the data-driven GRN produced by a chosen baseline ("teacher") method. The result is a near-universal improvement in AUROC and recall across evaluated methods, with only minor trade-offs in precision and minimal extra compute on top of the original inference.
+GRNITE improves gene regulatory network (GRN) inference from single-cell RNA-seq data. Rather than being another standalone inference algorithm, it is a lightweight **meta-method** that takes the output of *any* existing method and enhances it by combining LLM-based text descriptions of genes, curated biological prior knowledge, and the chosen method's data-driven GRN. This yields consistent gains across methods with minimal extra compute.
 
-At a high level, GRNITE runs in three stages:
-
-1. **Stage 1 — Contrastive refinement of gene embeddings (`stage1_lora.py`).** High-dimensional text embeddings of each gene (from a pretrained LLM such as Qwen3-Embedding-8B) are concatenated with a compressed summary of co-expression, then fine-tuned with a LoRA projector using a contrastive (InfoNCE) objective. The supervision target is a biologically informed adjacency built from the CellOracle base GRN combined with an expression-derived k-NN graph. The output is a compact, biologically aligned embedding for each gene.
-
-2. **Stage 2 — GNN-based teacher graph prediction (`stage2_gnn.py`).** The refined embeddings become node features in a graph autoencoder (TAGConv encoder + multi-head bilinear decoder) that learns to reconstruct a teacher GRN, while the biological prior acts as the fixed message-passing graph. An embedding-similarity regularizer anchors predictions to the Stage 1 geometry. The final GRNITE-enhanced network is obtained by keeping the top-scoring gene pairs (matched to the teacher's edge count).
-
-3. **Stage 3 — Evaluation (`run_eval.py`).** When a ground-truth reference network is available, each teacher baseline and its GRNITE-enhanced version are scored (AUROC, AUPRC, Jaccard, etc.).
+The pipeline runs in three stages: **Stage 1** (`stage1_lora.py`) refines text-based gene embeddings, **Stage 2** (`stage2_gnn.py`) uses a graph neural network to combine those embeddings with a "teacher" GRN, and **Stage 3** (`run_eval.py`) evaluates the results against a ground-truth network.
 
 ### Overview figure
 
