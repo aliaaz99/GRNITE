@@ -9,7 +9,7 @@ Data/
 │   ├── ExpressionData.csv      # REQUIRED — genes × cells expression matrix
 │   ├── refNetwork.csv          # OPTIONAL — ground-truth GRN (needed for evaluation)
 │   └── hESC-<teacher>.csv      # teacher GRN(s) to enhance (one per method)
-├── TF1000/hESC/
+├── TF1000/hESC/                # BEELINE TF+1000
 ├── GG/PBMC-ALL-Human/          # GRouNdGAN simulated example
 └── real_data/Cd81_h/           # biological single-cell example
 ```
