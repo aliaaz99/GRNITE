@@ -473,9 +473,9 @@ if __name__ == "__main__":
 
     # Add Other datasets here
     sample_names = [
-                    # "GroundGAN/PBMC-ALL-Human/",
+                    # "GG/PBMC-ALL-Human/",
 
-                    # "TF500/hESC/",
+                    "TF500/hESC/",
                     # "TF500/hHep/",
                     # "TF500/mDC/",
                     # "TF500/mESC/",
@@ -492,80 +492,12 @@ if __name__ == "__main__":
                     # "TF1000/mHSC-GM/",
                     # "TF1000/mHSC-L/",
 
-                    "lora/hESC/",
                      ]
 
     # Add other methods here
     method_names = [
-                    # "step1_grnite",
                     # "scenic-network", "scenic-network_grnite",
                     # "grnboost", "grnboost_grnite",
-
-                    "celloracle-whole",
-                    # "target-celloracle-whole_grnite_lora",
-                    # "lora-celloracle-whole_grnite_lora",
-
-                    # "lora-topr20-celloracle_grnite_lora_topk",
-                    # "random-topr20-celloracle_grnite_lora_topk",
-                    # "lora-topr10-celloracle_grnite_lora_topk",
-                    # "random-topr10-celloracle_grnite_lora_topk",
-                    # "lora-topr5-celloracle_grnite_lora_topk",
-                    # "random-topr5-celloracle_grnite_lora_topk",
-                    # "lora-topr2-celloracle_grnite_lora_topk",
-                    # "random-topr2-celloracle_grnite_lora_topk",
-                    # "gt-celloracle-whole_grnite_lora",
-                    # "gt-celloracle-whole_grnite_random",
-
-
-                    "scenic-network",
-                    # "lora-scenic-network_grnite_lora",
-                    # "target-scenic-network_grnite_random",
-                    # "lora-topr20-scenic_grnite_lora_topk",
-                    # "random-topr20-scenic_grnite_lora_topk",
-                    # "lora-topr10-scenic_grnite_lora_topk",
-                    # "random-topr10-scenic_grnite_lora_topk",
-                    # "lora-topr5-scenic_grnite_lora_topk",
-                    # "random-topr5-scenic_grnite_lora_topk",
-                    # "lora-topr2-scenic_grnite_lora_topk",
-                    # "random-topr2-scenic_grnite_lora_topk",
-
-                    # "gt-scenic-network_grnite_lora",
-                    # "gt-scenic-network_grnite_random",
-
-
-                    "grnboost",
-                    # "lora-grnboost_grnite_lora",
-                    # "target-grnboost_grnite_random",
-                    # "lora-topr20-grnboost_grnite_lora_topk",
-                    # "random-topr20-grnboost_grnite_lora_topk",
-                    # "lora-topr20-grnboost_grnite_lora_topk",
-                   # "target-grnboost_grnite_random",
-                    # "lora-topr10-grnboost_grnite_lora_topk",
-                    # "random-topr10-grnboost_grnite_lora_topk",
-                    # "lora-topr5-grnboost_grnite_lora_topk",
-                    # "random-topr5-grnboost_grnite_lora_topk",
-                    # "lora-topr2-grnboost_grnite_lora_topk",
-                    # "random-topr2-grnboost_grnite_lora_topk",
-                    # "gt-grnboost_grnite_lora",
-                    # "gt-grnboost_grnite_random",
-
-
-                    # "expr-knn",
-                    # "target_consensus",
-                    # "lora-consensus_grnite_lora",
-
-
-
-                    # "lora-groundtruth_grnite_lora_groundtruth_02",
-                    # "random-groundtruth_grnite_lora_groundtruth_02",
-
-                    # "lora-groundtruth_grnite_lora_groundtruth_10",
-                    # "random-groundtruth_grnite_lora_groundtruth_10",
-
-                    # "lora-groundtruth_grnite_lora_groundtruth_50",
-                    # "random-groundtruth_grnite_lora_groundtruth_50",
-                    # "random-groundtruth_grnite_lora_groundtruth",
-                    # "A_emb_lora_bin"
                     ]
 
     # Final results stored per sample
