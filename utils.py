@@ -12,7 +12,9 @@ import numpy as np
 import scipy.sparse as sp
 import torch.nn as nn
 import torch.nn.functional as F
-from torch_geometric.nn import TAGConv
+from torch_geometric.nn import TAGConv, GCNConv, SAGEConv, GATConv
+import warnings
+warnings.filterwarnings("ignore")
 
 
  
@@ -20,16 +22,20 @@ class GNNEncoder(nn.Module):
     def __init__(self, in_channels, hidden_channels_list, out_channels):
         super(GNNEncoder, self).__init__()
         self.layers = nn.ModuleList()
-        self.layers.append(TAGConv(in_channels, hidden_channels_list[0]))
-        for i in range(1, len(hidden_channels_list)):
-            self.layers.append(TAGConv(hidden_channels_list[i-1], hidden_channels_list[i]))
-        self.layers.append(TAGConv(hidden_channels_list[-1], out_channels))
+        if hidden_channels_list:
+            self.layers.append(TAGConv(in_channels, hidden_channels_list[0]))
+            for i in range(1, len(hidden_channels_list)):
+                self.layers.append(TAGConv(hidden_channels_list[i-1], hidden_channels_list[i]))
+            self.layers.append(TAGConv(hidden_channels_list[-1], out_channels))
+        else:
+            self.layers.append(TAGConv(in_channels, out_channels))
         self.final_layer = nn.Linear(out_channels, out_channels)
 
     def forward(self, x, edge_index):
         for layer in self.layers:
             x = F.relu(layer(x, edge_index))
         z = self.final_layer(x)
+        # z = F.normalize(z, p=2, dim=1)  # L2 normalization
         return z
 
 class BilinearDecoder(nn.Module):
@@ -102,6 +108,29 @@ def get_present(gene_names, gene_names_all, data):
 
     return present_genes, embeddings
 
+def get_present2(gene_names, gene_names_all, data):
+    """
+    Given a list of gene names and a dictionary of gene embeddings, 
+    return the distance matrix between the embeddings of those genes.
+    Case-insensitive matching is supported.
+    """
+    # Create a lowercase mapping from all gene names to their original casing
+    gene_map = {g.lower(): g for g in gene_names_all}
+
+    gene_embeddings_sample = []
+    present_genes = []
+
+    for gene_name in gene_names:
+        key = gene_name.lower()
+        if key in gene_map:
+            original_name = gene_map[key]
+            gene_embeddings_sample.append(data[original_name])
+            present_genes.append(gene_name)
+
+    embeddings = np.array(gene_embeddings_sample)
+    print("Present genes found:", len(present_genes), "Embeddings shape:", embeddings.shape)
+
+    return present_genes, embeddings
 
 
     

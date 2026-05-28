@@ -1,156 +1,148 @@
 # GRNITE
 
-This repository contains all the necessary code and commands for "GRNITE: Gene Regulatory Network Inference with Text Embeddings."
+This repository contains the code and commands for **"GRNITE: Gene Regulatory Network Inference with Text Embeddings."**
 
-In order to improve the quality of GRN inference and enable more comprehensive exploratory analyses of GRNs across various phenotypes of interest we developed a two-stage meta-method called GRNITE. In the first step, GRNITE leverages LLM-based embeddings of plain text gene descriptions to create a prior gene interaction graph which is then optimized with a graph neural network (GNN) to achieve a **universal** biological prior for GRN inference. In the second step, GRNITE uses a GNN to incorporate information from a GRN inferred from scRNA-seq data with any baseline inference method into our prior. The result of this two-step approach is a near-universal improvement in AUROC and recall of all evaluated methods, with minor trade-offs in precision. Furthermore, GRNITE is a lightweight meta-method, which adds minimal amount of extra compute time on top of the original GRN inference performed.
+## Overview
 
-<img width="7386" height="2796" alt="grn-inference-1-long" src="https://github.com/user-attachments/assets/64b4e60c-56e5-4eb6-820d-f7d3a9ade033" />
+Inferring gene regulatory networks (GRNs) from single-cell RNA-seq (scRNA-seq) data is a hard problem, and existing methods perform inconsistently across organisms and cell types. GRNITE is a lightweight **meta-method**: instead of being yet another standalone GRN inference algorithm, it takes the output of *any* existing method and improves it. It does so by combining three sources of information — the semantic content of LLM-based text descriptions of genes, curated biological prior knowledge (ChIP-seq-confirmed TF–target interactions), and the data-driven GRN produced by a chosen baseline ("teacher") method. The result is a near-universal improvement in AUROC and recall across evaluated methods, with only minor trade-offs in precision and minimal extra compute on top of the original inference.
 
+At a high level, GRNITE runs in three stages:
+
+1. **Stage 1 — Contrastive refinement of gene embeddings (`stage1_lora.py`).** High-dimensional text embeddings of each gene (from a pretrained LLM such as Qwen3-Embedding-8B) are concatenated with a compressed summary of co-expression, then fine-tuned with a LoRA projector using a contrastive (InfoNCE) objective. The supervision target is a biologically informed adjacency built from the CellOracle base GRN combined with an expression-derived k-NN graph. The output is a compact, biologically aligned embedding for each gene.
+
+2. **Stage 2 — GNN-based teacher graph prediction (`stage2_gnn.py`).** The refined embeddings become node features in a graph autoencoder (TAGConv encoder + multi-head bilinear decoder) that learns to reconstruct a teacher GRN, while the biological prior acts as the fixed message-passing graph. An embedding-similarity regularizer anchors predictions to the Stage 1 geometry. The final GRNITE-enhanced network is obtained by keeping the top-scoring gene pairs (matched to the teacher's edge count).
+
+3. **Stage 3 — Evaluation (`run_eval.py`).** When a ground-truth reference network is available, each teacher baseline and its GRNITE-enhanced version are scored (AUROC, AUPRC, Jaccard, etc.).
+
+### Overview figure
+
+<!-- TODO: replace the placeholder below with the updated GRNITE overview figure. -->
+<img width="7386" height="2796" alt="GRNITE overview (placeholder — updated figure to be added)" src="https://github.com/user-attachments/assets/64b4e60c-56e5-4eb6-820d-f7d3a9ade033" />
+
+> **Note:** The figure above is a placeholder showing the previous overview. The updated three-stage overview figure will be added here.
 
 ## Installation & Dependencies
 
-The code is based on Python 3.7 and should run on Unix-like operating systems (MacOS, Linux).
+The code runs on Unix-like operating systems (macOS, Linux).
 
-To install the dependencies for GRNITE, you can use the `environment.yml` file provided to build a Conda environment with all necessary dependencies. 
-The GRNITE environment will need to be activated for each usage. 
+You can build a Conda environment with all dependencies from the provided `environment.yml`. The environment must be activated for each usage.
 
 ```sh
 conda env create -f environment.yml
 conda activate GRNITE
 ```
 
-Additionally, you will need to install other packages using `pip` after creating and activating the environment.
+Alternatively (or additionally), install the Python dependencies with `pip`:
 
 ```sh
 pip install -r requirements.txt
 ```
 
-  
-## Running the Codes
+> For a CUDA build of PyTorch, install the wheel matching your CUDA version from https://pytorch.org (the paper environment used `torch==2.5.1+cu121`).
 
-1. **Folder Structure:**
-
-You should have the following directory structure in the project folder:
+## Repository structure
 
 ```
-├── Main.py
-├── utils.py
-├── Eval.py
-├── Gene_emebddings
-│ ├── human_embeds-Qwen3-Embedding-8B.h5
-│ ├── mouse_embeds-Qwen3-Embedding-8B.h5
-│ ├── celloracle_baseGRN.csv
-│ ├── celloracle_mouse_baseGRN.csv
-├── Data
-│ ├── TF500/hESC
-│ │ ├── ExpressionData.csv
-│ │ ├── refNetwork.csv (Optional for evaluation)
-│ │ ├── hESC-{MethodXName}.csv (Target graph obtained from method X)
-│ ├── GroundGAN/PBMC-ALL-Human
-│ │ ├── ExpressionData.csv
-│ │ ├── refNetwork.csv (Optional for evaluation)
-│ │ ├── PBMC-ALL-Human-{MethodXName}.csv (Target graph obtained from method X)
-│ ├── (other folders for different cases)
+GRNITE/
+├── run_pipeline.sh        # main entry point — runs the full pipeline end-to-end
+├── stage1_lora.py         # Stage 1: contrastive LoRA refinement of gene embeddings
+├── stage2_gnn.py          # Stage 2: GNN edge prediction against a teacher GRN
+├── run_eval.py            # Stage 3: batch evaluation wrapper
+├── Eval.py                # core AUROC/AUPRC/Jaccard evaluation routines
+├── utils.py               # shared GNN modules and helpers
+├── analyze_results.py     # summarize/visualize results (teacher- or method-based averages)
+├── baseline_summary.py    # report average teacher-method performance
+├── environment.yml        # Conda environment
+├── requirements.txt       # pip dependencies
+├── Gene_embeddings/       # downloaded text embeddings + base GRNs (see its README)
+├── Data/                  # per-dataset inputs and generated outputs (see its README)
+└── logs/                  # pipeline run logs
 ```
 
-You need to place your data files in the respective folders inside the `Data` directory. An example is provided above for `TF500/hESC` and `GroundGAN/PBMC-ALL-Human` dataset.
+## Inputs
 
-You can download the four files in the `Gene_embeddings` folder, which include the human and mouse text embeddings as well as the base CellOracle graph, from this [link](https://zenodo.org/records/17705020
-).
+For each dataset you create a folder under `Data/`, e.g. `Data/TF500/hESC/`, containing:
 
-2. **Generating the results:**
+- `ExpressionData.csv` — **required.** Genes × cells expression matrix.
+- `refNetwork.csv` — *optional*, needed only for evaluation. The ground-truth GRN.
+- `<dataset>-<teacher>.csv` — the teacher GRN(s) you want to enhance, one file per baseline method (e.g. `hESC-scenic-network.csv`, `hESC-grnboost.csv`).
 
-   You can run `Main.py` to execute GRNITE.  
-   To do so:
+All GRN and reference CSVs must contain `Gene1` and `Gene2` columns. See `Data/README.md` for the full teacher-method → filename mapping.
 
-   - If you are running the **first step** to generate the prior graph, specify:
-     ```bash
-     python Main.py --step 1
-     ```
-   - If you have already completed the first step and want to **enhance the GRN** of another method, run:
-     ```bash
-     python Main.py --step 2 --targetMethod $NAME
-     ```
-     where `$NAME` can be one of
-     ```bash
-     {scenic, grnboost, celloracle, portia, correlation, deeprig, dazzle}.
-     ```
-    **Note:** You must include the target GRN file of the method you wish to enhance in the corresponding data folder.
-    Below is the mapping between each method name and the expected GRN file name:
-   
-    | Method       | Expected GRN File Name                       |
-    | ------------ | -------------------------------------------- |
-    | `scenic`     | `{dataName}-scenic-network.csv`              |
-    | `grnboost`   | `{dataName}-grnboost.csv`                    |
-    | `celloracle` | `{dataName}-celloracle-whole.csv`            |
-    | `portia`     | `{dataName}-portia.csv`                      |
-    | `deeprig`    | `{dataName}-celloracle-deeprig_filtered.csv` |
-    | `dazzle`     | `{dataName}-dazzle-full_filtered.csv`        |
+You also need the shared resources in `Gene_embeddings/` (text embeddings and the CellOracle base GRNs). Download the four files from [this link](https://zenodo.org/records/17705020) and place them in `Gene_embeddings/` as described in `Gene_embeddings/README.md`.
 
+## Outputs
 
-   You can also run `Eval.py` to evaluate the GRNs you have generated against a reference network:
-   ```bash
-   python Eval.py
-   ```
-  Ensure that a file named `refNetwork.csv` is present in the data folder of each dataset to serve as the reference GRN if you want to perform evaluation.
+Running the pipeline produces, inside each dataset folder:
 
-  **Note:** All GRN files should contain columns named `Gene1` and `Gene2`.
+- The refined gene embeddings (`X_sample_lora_low_*.npy`) and the list of genes present in both the expression data and the embedding vocabulary (`present_genes_*.txt`).
+- The GRNITE-enhanced GRN for each teacher method, as an edge list with weights (`<dataset>-<source>-<teacher>_grnite.csv`).
+- Stage 1 preprocessing metrics (`preprocessing_metrics_<source>.json`) and diagnostic plots under `plots/`.
+- An evaluation workbook (`<dataset>_pipeline_results_<source>.xlsx`) with a `GRN_Eval` sheet (per-method AUROC/AUPRC/Jaccard) and a `Preprocessing` sheet, when a reference network is available.
 
-  
-3. **Parameters**
+## Usage
 
-   You can modify the following parameters when running `Main.py` to adjust GRNITE’s behavior and training configuration.
+The main entry point is **`run_pipeline.sh`**, which runs Stage 1 → Stage 2 → Stage 3 for the dataset and teacher methods you configure at the top of the file.
 
-| Parameter | Default Value | Description |
-|------------|----------------|--------------|
-| `--dataPath` | `'TF500/hESC'` | Path to the expression matrix and reference network. |
-| `--step` | `1` | Specifies which stage of GRNITE to run: Step 1 for generating the prior graph, Step 2 for enhancing an existing GRN method. |
-| `--targetMethod` | `'celloracle'` | Name of the GRN method to improve (used only in Step 2). |
-| `--n_low` | `100` | Number of dimensions for dimensionality reduction of the Expression matrix. |
-| `--neg_multiplier` | `1` | Ratio of negative samples to positive samples during training. |
-| `--gnn_dim_hidden` | `"32,32"` | Hidden layer sizes for the GNN encoder (comma-separated). |
-| `--name` | `'grnite'` | Suffix added to the names of saved graph files. |
-| `--sample` | `None` | Index for subsampling GroundGAN datasets (uses cell indices from `2000 × (sample – 1)` to `2000 × sample`). |
-| `--beta` | `0.5` | Weight balancing target loss vs. prior loss in Step 2. |
-| `--lr` | `0.01` | Learning rate for training the GNN model. |
-| `--num_epoch` | `5000` | Number of training epochs. |
-| `--gpu` | `0` | GPU ID to use (default: 0). |
+### Run the main pipeline
 
-## Example Usage
-
-1. **Download the data**
-
-Download the expression matrix for the `PBMC-ALL-Human` dataset from the [GroundGAN Benchmarking page](https://emad-combine-lab.github.io/GRouNdGAN/benchmarking).  
-Place the file at: ```Data/GroundGAN/PBMC-ALL-Human/ExpressionData.csv``` as described in the setup section above.
-The `ExpressionData.csv` for `TF500/hESC` is included here.
-
-2. **Run Step 1 – Prior graph generation**
-
-Execute the following bash script to run the first step of GRNITE, which constructs the prior graph for both datasets: `TF500/hESC` and `Data/GroundGAN/PBMC-ALL-Human`.
-
-```bash
-bash Step1.sh > logs/example_step_1.log
-```
-
-3. **Run Step 2 – Enhanced GRN generation**
-
-The output GRNs from **SCENIC** and **GRNBoost** are already included in the corresponding folders with `{dataname}-scenic-network.csv` and `{dataname}-grnboost.csv` names.
-You can now run the next script to generate the enhanced GRNs using GRNITE:
-
-  ```sh
-  bash Step2.sh > logs/example_step_2.log
-  ```
-
-4. **Evaluate the results**
-
-Finally, evaluate the base GRNs (SCENIC and GRNBoost) along with their GRNITE-enhanced versions using:
+Edit the `CONFIGURATION` block in `run_pipeline.sh` (set `DATASET`, `METHODS`, `EMBEDDING_SOURCE`, etc.), then:
 
 ```sh
-python Eval.py > logs/example_eval.log
+bash run_pipeline.sh > logs/example_run.log
 ```
 
-This will generate `Example_Eval.xlsx`, which contains different evaluation metrics for each method and dataset. Each sheet in the Excel file corresponds to a separate dataset.
+You can also run the stages individually, for example:
 
-# Citation
-If you use GRNITE in your research, please cite the following paper:
+```sh
+# Stage 1 — refine embeddings for one dataset
+python stage1_lora.py --data-path TF500/hESC --embedding-source Qwen --save-embedding
 
+# Stage 2 — enhance a single teacher GRN (e.g. SCENIC)
+python stage2_gnn.py --dataPath TF500/hESC --targetMethod scenic --embedding_source Qwen --name grnite
+
+# Stage 3 — evaluate baselines and their GRNITE versions
+python run_eval.py --dataset TF500/hESC --embedding_source Qwen \
+    --methods scenic-network,Qwen-scenic-network_grnite \
+    --output Data/TF500/hESC/hESC_pipeline_results_Qwen.xlsx
+```
+
+### (Optional) Run the ablation experiments
+
+The two ablations from the paper — a **Stage 1** variant initialized from random Gaussian features instead of text embeddings, and a **Stage 2** variant that uses random node features — are included in `run_pipeline.sh` but **commented out**. To run them, open `run_pipeline.sh` and uncomment the blocks marked `[ABLATION]` (the random Stage 1 baseline, the random Stage 2 training loop, and the ablation lines in the Stage 3 evaluation). They can also be invoked directly:
+
+```sh
+# Stage 1 ablation — random-initialized embeddings (same gene vocabulary as Qwen)
+python stage1_lora.py --data-path TF500/hESC --embedding-source random --gene-source Qwen --save-embedding
+
+# Stage 2 ablation — random node features
+python stage2_gnn.py --dataPath TF500/hESC --targetMethod scenic \
+    --embedding_source random --gene_source Qwen --name grnite_ablation
+```
+
+## Analyzing and summarizing results
+
+**`analyze_results.py`** visualizes the pipeline results. It compares each GRNITE-enhanced network against its teacher baseline (and, if present, the ablation), and reports the improvements both as **teacher-based averages** (mean improvement per teacher method, across datasets) and as **method/dataset-based averages** (mean improvement per dataset, across teachers). It writes summary tables (CSV/Markdown) and figures (heatmaps and bar charts) to an output directory.
+
+```sh
+python analyze_results.py --embedding_source Qwen --data_root Data/TF500
+```
+
+**`baseline_summary.py`** reports the average performance of the teacher methods themselves (CellOracle, GRNBoost, SCENIC, PORTIA, etc.), aggregated across datasets and dataset groups, as printed tables plus CSV/Excel files.
+
+```sh
+python baseline_summary.py --data_root Data
+```
+
+## Example data
+
+An `ExpressionData.csv` for `TF500/hESC` can be used as a starting example. For the GRouNdGAN datasets, download the expression matrix (e.g. `PBMC-ALL-Human`) from the [GRouNdGAN benchmarking page](https://emad-combine-lab.github.io/GRouNdGAN/benchmarking) and place it at `Data/GG/PBMC-ALL-Human/ExpressionData.csv`.
+
+## Citation
+
+If you use GRNITE in your research, please cite:
+
+```
+GRNITE: Gene regulatory network inference with text embeddings.
+Ali Azizpour, Narein Rao, Santiago Segarra, Luay Nakhleh, Nicolae Sapoval.
+```

@@ -19,6 +19,12 @@ from networkx.convert_matrix import from_pandas_adjacency
 import pdb
 
 
+def symmetrize_edges(df):
+    """Add reverse of every edge so both (A,B) and (B,A) are present."""
+    rev = df.rename(columns={"Gene1": "Gene2", "Gene2": "Gene1"})
+    return pd.concat([df, rev], ignore_index=True).drop_duplicates(subset=["Gene1", "Gene2"])
+
+
 def PRROC(ref_path, input_path, output_path, method, directed = True, selfEdges = False, plotFlag = False, restrict=False):
     '''
     Computes areas under the precision-recall and ROC curves
@@ -60,6 +66,8 @@ def PRROC(ref_path, input_path, output_path, method, directed = True, selfEdges 
             if len(pred_genes) < len(true_genes):
                 trueEdgesDF = trueEdgesDF[trueEdgesDF['Gene1'].isin(pred_genes) & trueEdgesDF['Gene2'].isin(pred_genes)]
 
+        trueEdgesDF = symmetrize_edges(trueEdgesDF)
+        predDF = symmetrize_edges(predDF)
 
         cm, precision_val , recall_val, f1_val, precision, recall, FPR, TPR, AUPRC, AUROC, ball_acc, mcc, gms, jc, num_edges_possible, num_edges_true, num_edges_pred = computeScores(trueEdgesDF, predDF, method, directed = True, selfEdges = selfEdges)
 
@@ -208,7 +216,7 @@ def computeScores(trueEdgesDF, predEdgeDF, method, directed = True, selfEdges = 
                            (trueEdgesDF['Gene2'] == key.split('|')[1])) |
                               ((trueEdgesDF['Gene2'] == key.split('|')[0]) &
                            (trueEdgesDF['Gene1'] == key.split('|')[1]))]) > 0:
-                TrueEdgeDict[key] = 1  
+                TrueEdgeDict[key] = 1
 
         # Compute PredEdgeDict Dictionary
         # from predEdgeDF
@@ -459,53 +467,140 @@ def EarlyPrec(ref_path, input_path, method):
     return EPR
 
 
-# Add Other datasets here
-sample_names = [
-                "GroundGAN/PBMC-ALL-Human/", 
-                "TF500/hESC/",
-                 ]
+if __name__ == "__main__":
+    # Embedding source used to select the correct ref_present file (genePT, Qwen, or random).
+    embedding_source = "genePT"
 
-# Add other methods here
-method_names = [
-                "scenic-network", "scenic-network_grnite",
-                "grnboost", "grnboost_grnite",
-                ]
+    # Add Other datasets here
+    sample_names = [
+                    # "GroundGAN/PBMC-ALL-Human/",
 
-
-
-# Final results stored per sample
-all_results = {}
-
-for sample in sample_names:
-    # Load reference edges
-    sample_name = sample.split('/')[-2]
-    print("=============================")
-    print(f"Processing Data: {sample_name}")
-    method_metrics = []
-
-    for method in method_names:
-        print("****")
-        print(f"Method: {method}")
-        try:
-            cm, precision, recall, f1, AUPRC, AUROC, ball_acc, jc, possible_edges, true_edges, pred_edges = PRROC("Data/"+sample+sample_name+"-ref_present.csv", "Data/"+sample+sample_name+"-"+method+".csv", "Data/"+sample+sample_name, sample_name+'-'+method, 
-                                                            directed = True, selfEdges = False, plotFlag = False, restrict=False)
-
-        except Exception as e:
-            print(f"Error in PRROC for method {method} on sample {sample_name}: {e}")
-            precision, recall, f1, AUPRC, AUROC, ball_acc, jc, possible_edges, true_edges, pred_edges = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-    
-        method_metrics.append([method, ball_acc, jc, precision, recall, f1, AUPRC, AUROC,  possible_edges, true_edges, pred_edges])
-        print("Confusion Matrix:")
-        print(cm)
-                
+                    # "TF500/hESC/",
+                    # "TF500/hHep/",
+                    # "TF500/mDC/",
+                    # "TF500/mESC/",
+                    # "TF500/mHSC-E/",
+                    # "TF500/mHSC-GM/",
+                    # "TF500/mHSC-L/",
 
 
-    # Create DataFrame with results
-    df_metrics = pd.DataFrame(method_metrics, columns=["Method","Balanced_Acc", "JC", "Precision", "Recall", "F1", "AUPRC", "AUROC", "Possible_Edges", "True_Edges", "Predicted_Edges"])
-    all_results[sample] = df_metrics
+                    # "TF1000/hESC/",
+                    # "TF1000/hHep/",
+                    # "TF1000/mDC/",
+                    # "TF1000/mESC/",
+                    # "TF1000/mHSC-E/",
+                    # "TF1000/mHSC-GM/",
+                    # "TF1000/mHSC-L/",
 
-writer = pd.ExcelWriter('Example_eval.xlsx')
-for key in all_results.keys():
-    sheet_name = key.split('/')[-2]
-    all_results[key].to_excel(writer, sheet_name=sheet_name, index=False)
-writer.close()
+                    "lora/hESC/",
+                     ]
+
+    # Add other methods here
+    method_names = [
+                    # "step1_grnite",
+                    # "scenic-network", "scenic-network_grnite",
+                    # "grnboost", "grnboost_grnite",
+
+                    "celloracle-whole",
+                    # "target-celloracle-whole_grnite_lora",
+                    # "lora-celloracle-whole_grnite_lora",
+
+                    # "lora-topr20-celloracle_grnite_lora_topk",
+                    # "random-topr20-celloracle_grnite_lora_topk",
+                    # "lora-topr10-celloracle_grnite_lora_topk",
+                    # "random-topr10-celloracle_grnite_lora_topk",
+                    # "lora-topr5-celloracle_grnite_lora_topk",
+                    # "random-topr5-celloracle_grnite_lora_topk",
+                    # "lora-topr2-celloracle_grnite_lora_topk",
+                    # "random-topr2-celloracle_grnite_lora_topk",
+                    # "gt-celloracle-whole_grnite_lora",
+                    # "gt-celloracle-whole_grnite_random",
+
+
+                    "scenic-network",
+                    # "lora-scenic-network_grnite_lora",
+                    # "target-scenic-network_grnite_random",
+                    # "lora-topr20-scenic_grnite_lora_topk",
+                    # "random-topr20-scenic_grnite_lora_topk",
+                    # "lora-topr10-scenic_grnite_lora_topk",
+                    # "random-topr10-scenic_grnite_lora_topk",
+                    # "lora-topr5-scenic_grnite_lora_topk",
+                    # "random-topr5-scenic_grnite_lora_topk",
+                    # "lora-topr2-scenic_grnite_lora_topk",
+                    # "random-topr2-scenic_grnite_lora_topk",
+
+                    # "gt-scenic-network_grnite_lora",
+                    # "gt-scenic-network_grnite_random",
+
+
+                    "grnboost",
+                    # "lora-grnboost_grnite_lora",
+                    # "target-grnboost_grnite_random",
+                    # "lora-topr20-grnboost_grnite_lora_topk",
+                    # "random-topr20-grnboost_grnite_lora_topk",
+                    # "lora-topr20-grnboost_grnite_lora_topk",
+                   # "target-grnboost_grnite_random",
+                    # "lora-topr10-grnboost_grnite_lora_topk",
+                    # "random-topr10-grnboost_grnite_lora_topk",
+                    # "lora-topr5-grnboost_grnite_lora_topk",
+                    # "random-topr5-grnboost_grnite_lora_topk",
+                    # "lora-topr2-grnboost_grnite_lora_topk",
+                    # "random-topr2-grnboost_grnite_lora_topk",
+                    # "gt-grnboost_grnite_lora",
+                    # "gt-grnboost_grnite_random",
+
+
+                    # "expr-knn",
+                    # "target_consensus",
+                    # "lora-consensus_grnite_lora",
+
+
+
+                    # "lora-groundtruth_grnite_lora_groundtruth_02",
+                    # "random-groundtruth_grnite_lora_groundtruth_02",
+
+                    # "lora-groundtruth_grnite_lora_groundtruth_10",
+                    # "random-groundtruth_grnite_lora_groundtruth_10",
+
+                    # "lora-groundtruth_grnite_lora_groundtruth_50",
+                    # "random-groundtruth_grnite_lora_groundtruth_50",
+                    # "random-groundtruth_grnite_lora_groundtruth",
+                    # "A_emb_lora_bin"
+                    ]
+
+    # Final results stored per sample
+    all_results = {}
+
+    for sample in sample_names:
+        # Load reference edges
+        sample_name = sample.split('/')[-2]
+        print("=============================")
+        print(f"Processing Data: {sample_name}")
+        method_metrics = []
+
+        for method in method_names:
+            print("****")
+            print(f"Method: {method}")
+            cm = None
+            try:
+                cm, precision, recall, f1, AUPRC, AUROC, ball_acc, jc, possible_edges, true_edges, pred_edges = PRROC("Data/"+sample+sample_name+"-ref_present_"+embedding_source+".csv", "Data/"+sample+sample_name+"-"+method+".csv", "Data/"+sample+sample_name, sample_name+'-'+method,
+                                                                directed = True, selfEdges = False, plotFlag = False, restrict=False)
+
+            except Exception as e:
+                print(f"Error in PRROC for method {method} on sample {sample_name}: {e}")
+                precision, recall, f1, AUPRC, AUROC, ball_acc, jc = 0, 0, 0, 0, 0, 0, 0
+                possible_edges, true_edges, pred_edges = 0, 0, 0
+
+            method_metrics.append([method, ball_acc, jc, precision, recall, f1, AUPRC, AUROC,  possible_edges, true_edges, pred_edges])
+            print("Confusion Matrix:")
+            print(cm)
+
+        # Create DataFrame with results
+        df_metrics = pd.DataFrame(method_metrics, columns=["Method","Balanced_Acc", "JC", "Precision", "Recall", "F1", "AUPRC", "AUROC", "Possible_Edges", "True_Edges", "Predicted_Edges"])
+        all_results[sample] = df_metrics
+
+    writer = pd.ExcelWriter('lora_hESC_3loss.xlsx')
+    for key in all_results.keys():
+        sheet_name = key.split('/')[-2]
+        all_results[key].to_excel(writer, sheet_name=sheet_name, index=False)
+    writer.close()
