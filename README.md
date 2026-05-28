@@ -137,6 +137,12 @@ An `ExpressionData.csv` for `TF500/hESC` can be used as a starting example. For 
 If you use GRNITE in your research, please cite:
 
 ```
-GRNITE: Gene regulatory network inference with text embeddings.
-Ali Azizpour, Narein Rao, Santiago Segarra, Luay Nakhleh, Nicolae Sapoval.
+@article{azizpour2025grnite,
+  title={GRNITE: Gene Regulatory Network Inference with Text Embeddings},
+  author={Azizpour, Ali and Rao, Narein and Segarra, Santiago and Nakhleh, Luay and Sapoval, Nicolae},
+  journal={bioRxiv},
+  pages={2025--11},
+  year={2025},
+  publisher={Cold Spring Harbor Laboratory}
+}
 ```
