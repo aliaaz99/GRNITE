@@ -34,8 +34,8 @@ import seaborn as sns
 
 # ── Configuration ──────────────────────────────────────────────────────────────
 
-DEFAULT_DATASETS = ["hESC", "hHep", "mESC", "mHSC-E", "mHSC-GM", "mHSC-L"] # "mDC",
-# DEFAULT_DATASETS = ["PBMC-ALL-Human", "PBMC-CTL-Human", "Tumor-ALL", "Tumor-malignant", "Dahlin", ] # "BoneMarrow"
+DEFAULT_DATASETS = ["hESC", "hHep", "mESC", "mHSC-E", "mHSC-GM", "mHSC-L"]
+# DEFAULT_DATASETS = ["PBMC-ALL-Human", "PBMC-CTL-Human", "Tumor-ALL", "Tumor-malignant", "Dahlin", ]
 GRN_METRICS = ["AUROC", "AUPRC", "JC"]
 LORA_METRIC = "AUROC_vs_Atrue"
 
